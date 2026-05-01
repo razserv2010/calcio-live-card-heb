@@ -21,7 +21,7 @@ class CalcioLiveTodayMatchesCard extends LitElement {
 
   setConfig(config) {
     if (!config.entity) {
-      throw new Error("Devi definire un'entità");
+      throw new Error("יש להגדיר ישות");
     }
     this._config = config;
     this.maxEventsVisible = config.max_events_visible ? config.max_events_visible : 5;
@@ -89,11 +89,11 @@ class CalcioLiveTodayMatchesCard extends LitElement {
   _showEventToast(eventType, eventData) {
     let message = '';
     if (eventType === 'calcio_live_goal') {
-      message = `🔥 GOAL! ${eventData.player} - ${eventData.home_team} ${eventData.home_score} - ${eventData.away_score} ${eventData.away_team}`;
+      message = `🔥 שער! ${eventData.player} - ${eventData.home_team} ${eventData.home_score} - ${eventData.away_score} ${eventData.away_team}`;
     } else if (eventType === 'calcio_live_yellow_card') {
-      message = `🟨 Cartellino Giallo: ${eventData.player}${eventData.minute ? ` (${eventData.minute}')` : ''}`;
+      message = `🟨 כרטיס צהוב: ${eventData.player}${eventData.minute ? ` (${eventData.minute}')` : ''}`;
     } else if (eventType === 'calcio_live_red_card') {
-      message = `🟥 Cartellino Rosso: ${eventData.player}${eventData.minute ? ` (${eventData.minute}')` : ''}`;
+      message = `🟥 כרטיס אדום: ${eventData.player}${eventData.minute ? ` (${eventData.minute}')` : ''}`;
     }
     if (message && this.hass) {
       this.hass.callService('persistent_notification', 'create', {
@@ -104,7 +104,6 @@ class CalcioLiveTodayMatchesCard extends LitElement {
       });
     }
   }
-  
 
   getCardSize() {
     return 3;
@@ -124,21 +123,18 @@ class CalcioLiveTodayMatchesCard extends LitElement {
       hide_header: false,
     };
   }
-  
+
   _parseMatchDate(dateStr) {
     const [datePart, timePart] = dateStr.split(' ');
     const [day, month, year] = datePart.split('/').map(Number);
-  
     const [hours, minutes] = timePart ? timePart.split(':').map(Number) : [0, 0];
-
     const matchDate = new Date(year, month - 1, day, hours, minutes);
-
     return matchDate;
   }
-  
+
   getMatchStatusText(match) {
     if (match.completed) {
-      return `${match.home_score} - ${match.away_score} (Full Time)`;
+      return `${match.home_score} - ${match.away_score} (סיום)`;
     }
     if (match.period === 1 || match.period === 2) {
       return `${match.home_score} - ${match.away_score} (${match.clock})`;
@@ -146,11 +142,10 @@ class CalcioLiveTodayMatchesCard extends LitElement {
     if (match.status === 'Scheduled') {
       return `${match.date}`;
     }
-    // Aggiungi un controllo per 'season_info' se i dati non sono disponibili
     if (match.season_info) {
       return `${match.season_info}`;
     }
-    return 'Dati non disponibili';
+    return 'נתונים לא זמינים';
   }
 
   showDetails(match) {
@@ -182,17 +177,17 @@ class CalcioLiveTodayMatchesCard extends LitElement {
 
   renderMatchDetails(details, clock) {
     if (!details || details.length === 0) {
-      return html`<p>Nessun dettaglio disponibile.</p>`;
+      return html`<p>אין פרטים זמינים.</p>`;
     }
 
     const { goals, yellowCards, redCards } = this.separateEvents(details);
 
     return html`
-      ${clock ? html`<p><strong>Clock finale:</strong> ${clock}</p>` : ''}
+      ${clock ? html`<p><strong>שעון סופי:</strong> ${clock}</p>` : ''}
       ${goals.length > 0
         ? html`
             <div class="event-section">
-              <h5 class="event-title">Goal</h5>
+              <h5 class="event-title">שערים</h5>
               <ul class="goal-details">
                 ${goals.map(goal => html`<li>${goal}</li>`)}
               </ul>
@@ -201,7 +196,7 @@ class CalcioLiveTodayMatchesCard extends LitElement {
       ${yellowCards.length > 0
         ? html`
             <div class="event-section">
-              <h5 class="event-title">Cartellini Gialli</h5>
+              <h5 class="event-title">כרטיסים צהובים</h5>
               <ul class="yellow-card-details">
                 ${yellowCards.map(card => html`<li>${card}</li>`)}
               </ul>
@@ -210,7 +205,7 @@ class CalcioLiveTodayMatchesCard extends LitElement {
       ${redCards.length > 0
         ? html`
             <div class="event-section">
-              <h5 class="event-title">Cartellini Rossi</h5>
+              <h5 class="event-title">כרטיסים אדומים</h5>
               <ul class="red-card-details">
                 ${redCards.map(card => html`<li>${card}</li>`)}
               </ul>
@@ -220,95 +215,95 @@ class CalcioLiveTodayMatchesCard extends LitElement {
   }
 
   render() {
-      if (!this.hass || !this._config) {
-        return html``;
-      }
+    if (!this.hass || !this._config) {
+      return html``;
+    }
 
-      const entityId = this._config.entity;
-      const stateObj = this.hass.states[entityId];
+    const entityId = this._config.entity;
+    const stateObj = this.hass.states[entityId];
 
-      if (!stateObj) {
-        return html`<ha-card>Entità sconosciuta: ${entityId}</ha-card>`;
-      }
+    if (!stateObj) {
+      return html`<ha-card>ישות לא ידועה: ${entityId}</ha-card>`;
+    }
 
-      let matches = stateObj.attributes.matches || [];
-      const leagueInfo = stateObj.attributes.league_info ? stateObj.attributes.league_info[0] : null;
-      const teamLogo = stateObj.attributes.team_logo || null;
+    let matches = stateObj.attributes.matches || [];
+    const leagueInfo = stateObj.attributes.league_info ? stateObj.attributes.league_info[0] : null;
+    const teamLogo = stateObj.attributes.team_logo || null;
 
-      if (!this.showFinishedMatches) {
-        matches = matches.filter((match) => match.status !== "Full Time");
-      }
-      
-      matches = matches.sort((a, b) => new Date(a.date) - new Date(b.date));
-      
-      const currentDate = new Date();
-      if (this.hidePastDays > 0) {
-        const daysAgo = new Date(currentDate);
-        daysAgo.setDate(daysAgo.getDate() - this.hidePastDays);
+    if (!this.showFinishedMatches) {
+      matches = matches.filter((match) => match.status !== "Full Time");
+    }
 
-        console.log(`Current date: ${currentDate}, Filter date (days ago): ${daysAgo}`);
+    matches = matches.sort((a, b) => new Date(a.date) - new Date(b.date));
 
-        matches = matches.filter((match) => {
-          const matchDate = this._parseMatchDate(match.date);
-          return matchDate >= daysAgo;
-        });
-      }
+    const currentDate = new Date();
+    if (this.hidePastDays > 0) {
+      const daysAgo = new Date(currentDate);
+      daysAgo.setDate(daysAgo.getDate() - this.hidePastDays);
 
-      const limitedMatches = matches.slice(0, this.maxEventsTotal);
+      console.log(`תאריך נוכחי: ${currentDate}, תאריך סינון (ימים אחורה): ${daysAgo}`);
 
-      if (limitedMatches.length === 0) {
-        return html`<ha-card>Nessuna partita disponibile</ha-card>`;
-      }
+      matches = matches.filter((match) => {
+        const matchDate = this._parseMatchDate(match.date);
+        return matchDate >= daysAgo;
+      });
+    }
 
-      const scrollHeight = this.maxEventsVisible * 150;
+    const limitedMatches = matches.slice(0, this.maxEventsTotal);
 
-      return html`
-        <ha-card>
-          ${!this.hideHeader ? html`
-          <div class="header">
-            ${leagueInfo && leagueInfo.logo_href ? html`
-            <div class="league-header">
-              <img class="league-logo" src="${leagueInfo.logo_href}" alt="Logo ${leagueInfo.abbreviation}" />
-              <div class="league-info">
-                <div class="league-name">${leagueInfo.abbreviation}</div>
-                <div class="league-dates">${leagueInfo.startDate} - ${leagueInfo.endDate}</div>
-              </div>
-            </div>` : ''}
+    if (limitedMatches.length === 0) {
+      return html`<ha-card>אין משחקים זמינים</ha-card>`;
+    }
 
-            ${teamLogo ? html`
-            <div class="team-header">
-              <img class="team-logo" src="${teamLogo}" alt="Logo del Team" />
-            </div>` : ''}
-          </div>
-          ` : ''}
-          <div class="scroll-content" style="max-height: ${scrollHeight}px; overflow-y: auto;">
-            ${limitedMatches.map((match, index) => html`
-              <div class="match-wrapper ${this._recentEventMatches.has(`${match.home_team}_${match.away_team}`) ? 'event-highlight' : ''}">
-                <div class="match-header">
-                  <div class="match-competition">
-                    ${match.venue} | <span class="match-date">${match.date}</span>
-                    ${(match.period > 0 || match.completed) 
-                      ? html`<span class="info-icon" @click="${() => this.showDetails(match)}">Info</span>`
-                      : ''}
-                  </div>
+    const scrollHeight = this.maxEventsVisible * 150;
+
+    return html`
+      <ha-card>
+        ${!this.hideHeader ? html`
+        <div class="header">
+          ${leagueInfo && leagueInfo.logo_href ? html`
+          <div class="league-header">
+            <img class="league-logo" src="${leagueInfo.logo_href}" alt="לוגו ${leagueInfo.abbreviation}" />
+            <div class="league-info">
+              <div class="league-name">${leagueInfo.abbreviation}</div>
+              <div class="league-dates">${leagueInfo.startDate} - ${leagueInfo.endDate}</div>
+            </div>
+          </div>` : ''}
+
+          ${teamLogo ? html`
+          <div class="team-header">
+            <img class="team-logo" src="${teamLogo}" alt="לוגו הקבוצה" />
+          </div>` : ''}
+        </div>
+        ` : ''}
+        <div class="scroll-content" style="max-height: ${scrollHeight}px; overflow-y: auto;">
+          ${limitedMatches.map((match, index) => html`
+            <div class="match-wrapper ${this._recentEventMatches.has(`${match.home_team}_${match.away_team}`) ? 'event-highlight' : ''}">
+              <div class="match-header">
+                <div class="match-competition">
+                  ${match.venue} | <span class="match-date">${match.date}</span>
+                  ${(match.period > 0 || match.completed)
+                    ? html`<span class="info-icon" @click="${() => this.showDetails(match)}">פרטים</span>`
+                    : ''}
                 </div>
-                <div class="match">
-                  <img class="team-logo" src="${match.home_logo}" alt="${match.home_team}" />
-                  <div class="match-info">
-                    <div class="team-name">${match.home_team}</div>
-                    <div class="match-result">
-                      ${this.getMatchStatusText(match)}
-                    </div>
-                    <div class="team-name">${match.away_team}</div>
-                  </div>
-                  <img class="team-logo" src="${match.away_logo}" alt="${match.away_team}" />
-                </div>
-                ${index < limitedMatches.length - 1 ? html`<hr class="separator-line" />` : ''}
               </div>
-            `)}
-          </div>
-        </ha-card>
-      `;
+              <div class="match">
+                <img class="team-logo" src="${match.home_logo}" alt="${match.home_team}" />
+                <div class="match-info">
+                  <div class="team-name">${match.home_team}</div>
+                  <div class="match-result">
+                    ${this.getMatchStatusText(match)}
+                  </div>
+                  <div class="team-name">${match.away_team}</div>
+                </div>
+                <img class="team-logo" src="${match.away_logo}" alt="${match.away_team}" />
+              </div>
+              ${index < limitedMatches.length - 1 ? html`<hr class="separator-line" />` : ''}
+            </div>
+          `)}
+        </div>
+      </ha-card>
+    `;
   }
 
   updated(changedProperties) {
@@ -353,7 +348,7 @@ class CalcioLiveTodayMatchesCard extends LitElement {
 
     popupContainer.innerHTML = `
       <div style="background: white; padding: 20px; border-radius: 12px; width: 90%; max-width: 550px; max-height: 80vh; overflow-y: auto; border: 4px solid #1f5cff; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4); margin: auto; color: #333;">
-        <h3 style="color: #1f5cff; margin-top: 0; margin-bottom: 16px; font-size: 20px; border-bottom: 2px solid #1f5cff; padding-bottom: 10px;">Dettagli Partita</h3>
+        <h3 style="color: #1f5cff; margin-top: 0; margin-bottom: 16px; font-size: 20px; border-bottom: 2px solid #1f5cff; padding-bottom: 10px;">פרטי משחק</h3>
         <div style="display: flex; justify-content: center; align-items: center; margin-bottom: 20px;">
           <img style="width: 70px; height: 70px; margin: 0 15px; border-radius: 8px;" src="${this.activeMatch.home_logo}" alt="${this.activeMatch.home_team}" />
           <div style="text-align: center;">
@@ -362,45 +357,45 @@ class CalcioLiveTodayMatchesCard extends LitElement {
           </div>
           <img style="width: 70px; height: 70px; margin: 0 15px; border-radius: 8px;" src="${this.activeMatch.away_logo}" alt="${this.activeMatch.away_team}" />
         </div>
-        <p style="text-align: center; color: #666; font-size: 14px; margin: 8px 0;"><strong style="color: #333;">${this.activeMatch.home_team}</strong> vs <strong style="color: #333;">${this.activeMatch.away_team}</strong></p>
-        <p style="color: #333;"><strong style="color: #333;">Formazione Casa:</strong> <span style="color: #2ecc71; font-weight: bold;">${this.activeMatch.home_form}</span></p>
-        <p style="color: #333;"><strong style="color: #333;">Formazione Trasferta:</strong> <span style="color: #e74c3c; font-weight: bold;">${this.activeMatch.away_form}</span></p>
-        <p style="margin-top: 15px; color: #333;"><strong style="color: #1f5cff;">Statistiche Casa:</strong></p>
+        <p style="text-align: center; color: #666; font-size: 14px; margin: 8px 0;"><strong style="color: #333;">${this.activeMatch.home_team}</strong> נגד <strong style="color: #333;">${this.activeMatch.away_team}</strong></p>
+        <p style="color: #333;"><strong style="color: #333;">סגנון בית:</strong> <span style="color: #2ecc71; font-weight: bold;">${this.activeMatch.home_form}</span></p>
+        <p style="color: #333;"><strong style="color: #333;">סגנון אורחים:</strong> <span style="color: #e74c3c; font-weight: bold;">${this.activeMatch.away_form}</span></p>
+        <p style="margin-top: 15px; color: #333;"><strong style="color: #1f5cff;">סטטיסטיקות בית:</strong></p>
         <ul style="margin: 8px 0; padding-left: 20px; list-style: none;">
-          <li style="padding: 4px 0; color: #333;">Possesso Palla: <span style="color: #1f5cff; font-weight: bold;">${this.activeMatch.home_statistics?.possessionPct ?? 'N/A'}%</span></li>
-          <li style="padding: 4px 0; color: #333;">Tiri Totali: <span style="color: #1f5cff; font-weight: bold;">${this.activeMatch.home_statistics?.totalShots ?? 'N/A'}</span></li>
-          <li style="padding: 4px 0; color: #333;">Tiri in Porta: <span style="color: #1f5cff; font-weight: bold;">${this.activeMatch.home_statistics?.shotsOnTarget ?? 'N/A'}</span></li>
-          <li style="padding: 4px 0; color: #333;">Falli Comessi: <span style="color: #1f5cff; font-weight: bold;">${this.activeMatch.home_statistics?.foulsCommitted ?? 'N/A'}</span></li>
-          <li style="padding: 4px 0; color: #333;">Assist: <span style="color: #1f5cff; font-weight: bold;">${this.activeMatch.home_statistics?.goalAssists ?? 'N/A'}</span></li>
+          <li style="padding: 4px 0; color: #333;">החזקת כדור: <span style="color: #1f5cff; font-weight: bold;">${this.activeMatch.home_statistics?.possessionPct ?? 'N/A'}%</span></li>
+          <li style="padding: 4px 0; color: #333;">סה"כ בעיטות: <span style="color: #1f5cff; font-weight: bold;">${this.activeMatch.home_statistics?.totalShots ?? 'N/A'}</span></li>
+          <li style="padding: 4px 0; color: #333;">בעיטות לשער: <span style="color: #1f5cff; font-weight: bold;">${this.activeMatch.home_statistics?.shotsOnTarget ?? 'N/A'}</span></li>
+          <li style="padding: 4px 0; color: #333;">עבירות: <span style="color: #1f5cff; font-weight: bold;">${this.activeMatch.home_statistics?.foulsCommitted ?? 'N/A'}</span></li>
+          <li style="padding: 4px 0; color: #333;">בישולים: <span style="color: #1f5cff; font-weight: bold;">${this.activeMatch.home_statistics?.goalAssists ?? 'N/A'}</span></li>
         </ul>
-        <p style="margin-top: 15px; color: #333;"><strong style="color: #1f5cff;">Statistiche Trasferta:</strong></p>
+        <p style="margin-top: 15px; color: #333;"><strong style="color: #1f5cff;">סטטיסטיקות אורחים:</strong></p>
         <ul style="margin: 8px 0; padding-left: 20px; list-style: none;">
-          <li style="padding: 4px 0; color: #333;">Possesso Palla: <span style="color: #1f5cff; font-weight: bold;">${this.activeMatch.away_statistics?.possessionPct ?? 'N/A'}%</span></li>
-          <li style="padding: 4px 0; color: #333;">Tiri Totali: <span style="color: #1f5cff; font-weight: bold;">${this.activeMatch.away_statistics?.totalShots ?? 'N/A'}</span></li>
-          <li style="padding: 4px 0; color: #333;">Tiri in Porta: <span style="color: #1f5cff; font-weight: bold;">${this.activeMatch.away_statistics?.shotsOnTarget ?? 'N/A'}</span></li>
-          <li style="padding: 4px 0; color: #333;">Falli Comessi: <span style="color: #1f5cff; font-weight: bold;">${this.activeMatch.away_statistics?.foulsCommitted ?? 'N/A'}</span></li>
-          <li style="padding: 4px 0; color: #333;">Assist: <span style="color: #1f5cff; font-weight: bold;">${this.activeMatch.away_statistics?.goalAssists ?? 'N/A'}</span></li>
+          <li style="padding: 4px 0; color: #333;">החזקת כדור: <span style="color: #1f5cff; font-weight: bold;">${this.activeMatch.away_statistics?.possessionPct ?? 'N/A'}%</span></li>
+          <li style="padding: 4px 0; color: #333;">סה"כ בעיטות: <span style="color: #1f5cff; font-weight: bold;">${this.activeMatch.away_statistics?.totalShots ?? 'N/A'}</span></li>
+          <li style="padding: 4px 0; color: #333;">בעיטות לשער: <span style="color: #1f5cff; font-weight: bold;">${this.activeMatch.away_statistics?.shotsOnTarget ?? 'N/A'}</span></li>
+          <li style="padding: 4px 0; color: #333;">עבירות: <span style="color: #1f5cff; font-weight: bold;">${this.activeMatch.away_statistics?.foulsCommitted ?? 'N/A'}</span></li>
+          <li style="padding: 4px 0; color: #333;">בישולים: <span style="color: #1f5cff; font-weight: bold;">${this.activeMatch.away_statistics?.goalAssists ?? 'N/A'}</span></li>
         </ul>
-        <h4 style="color: #1f5cff; margin-top: 20px; margin-bottom: 12px; font-size: 16px; border-bottom: 2px solid #1f5cff; padding-bottom: 8px;">Eventi Partita</h4>
+        <h4 style="color: #1f5cff; margin-top: 20px; margin-bottom: 12px; font-size: 16px; border-bottom: 2px solid #1f5cff; padding-bottom: 8px;">אירועי המשחק</h4>
         <div id="matches-events-container"></div>
-        <button style="background: #1f5cff; color: white; padding: 12px 20px; border: none; border-radius: 6px; cursor: pointer; margin-top: 20px; font-weight: bold; width: 100%; font-size: 14px; transition: background 0.3s;" onclick="document.getElementById('calcio-live-matches-popup').remove();" onmouseover="this.style.background='#1e5ad1';" onmouseout="this.style.background='#1f5cff';">Chiudi</button>
+        <button style="background: #1f5cff; color: white; padding: 12px 20px; border: none; border-radius: 6px; cursor: pointer; margin-top: 20px; font-weight: bold; width: 100%; font-size: 14px; transition: background 0.3s;" onclick="document.getElementById('calcio-live-matches-popup').remove();" onmouseover="this.style.background='#1e5ad1';" onmouseout="this.style.background='#1f5cff';">סגור</button>
       </div>
     `;
 
     const eventsContainer = popupContainer.querySelector('#matches-events-container');
     const { goals, yellowCards, redCards } = this.separateEvents(this.activeMatch.match_details || []);
-    
+
     let eventsHTML = '';
     if (goals.length > 0) {
-      eventsHTML += `<div style="margin-bottom: 16px; padding: 12px; background: #f0f4ff; border-left: 4px solid #1f5cff; border-radius: 4px;"><h5 style="color: #1f5cff; font-weight: bold; margin: 0 0 8px 0; font-size: 14px;">Goal</h5><ul style="margin: 0; padding-left: 20px; list-style: none;"><li style="color: #333; padding: 2px 0;">${goals.join('</li><li style="color: #333; padding: 2px 0;">')}</li></ul></div>`;
+      eventsHTML += `<div style="margin-bottom: 16px; padding: 12px; background: #f0f4ff; border-left: 4px solid #1f5cff; border-radius: 4px;"><h5 style="color: #1f5cff; font-weight: bold; margin: 0 0 8px 0; font-size: 14px;">שערים</h5><ul style="margin: 0; padding-left: 20px; list-style: none;"><li style="color: #333; padding: 2px 0;">${goals.join('</li><li style="color: #333; padding: 2px 0;">')}</li></ul></div>`;
     }
     if (yellowCards.length > 0) {
-      eventsHTML += `<div style="margin-bottom: 16px; padding: 12px; background: #fffbf0; border-left: 4px solid #f39c12; border-radius: 4px;"><h5 style="color: #f39c12; font-weight: bold; margin: 0 0 8px 0; font-size: 14px;">Cartellini Gialli</h5><ul style="margin: 0; padding-left: 20px; list-style: none;"><li style="color: #333; padding: 2px 0;">${yellowCards.join('</li><li style="color: #333; padding: 2px 0;">')}</li></ul></div>`;
+      eventsHTML += `<div style="margin-bottom: 16px; padding: 12px; background: #fffbf0; border-left: 4px solid #f39c12; border-radius: 4px;"><h5 style="color: #f39c12; font-weight: bold; margin: 0 0 8px 0; font-size: 14px;">כרטיסים צהובים</h5><ul style="margin: 0; padding-left: 20px; list-style: none;"><li style="color: #333; padding: 2px 0;">${yellowCards.join('</li><li style="color: #333; padding: 2px 0;">')}</li></ul></div>`;
     }
     if (redCards.length > 0) {
-      eventsHTML += `<div style="margin-bottom: 16px; padding: 12px; background: #fef0f0; border-left: 4px solid #e74c3c; border-radius: 4px;"><h5 style="color: #e74c3c; font-weight: bold; margin: 0 0 8px 0; font-size: 14px;">Cartellini Rossi</h5><ul style="margin: 0; padding-left: 20px; list-style: none;"><li style="color: #333; padding: 2px 0;">${redCards.join('</li><li style="color: #333; padding: 2px 0;">')}</li></ul></div>`;
+      eventsHTML += `<div style="margin-bottom: 16px; padding: 12px; background: #fef0f0; border-left: 4px solid #e74c3c; border-radius: 4px;"><h5 style="color: #e74c3c; font-weight: bold; margin: 0 0 8px 0; font-size: 14px;">כרטיסים אדומים</h5><ul style="margin: 0; padding-left: 20px; list-style: none;"><li style="color: #333; padding: 2px 0;">${redCards.join('</li><li style="color: #333; padding: 2px 0;">')}</li></ul></div>`;
     }
-    eventsContainer.innerHTML = eventsHTML || '<p style="text-align: center; color: #999; font-size: 14px;">Nessun evento disponibile</p>';
+    eventsContainer.innerHTML = eventsHTML || '<p style="text-align: center; color: #999; font-size: 14px;">אין אירועים זמינים</p>';
   }
 
   static get styles() {
@@ -602,6 +597,6 @@ customElements.define("calcio-live-matches", CalcioLiveTodayMatchesCard);
 window.customCards = window.customCards || [];
 window.customCards.push({
   type: 'calcio-live-matches',
-  name: 'Calcio Live Matches Card',
-  description: 'Mostra le partite della settimana o del tuo Team',
+  name: 'Calcio Live - כרטיס משחקים',
+  description: 'מציג את משחקי השבוע או של הקבוצה שלך',
 });
