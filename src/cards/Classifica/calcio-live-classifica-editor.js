@@ -22,7 +22,7 @@ class CalcioLiveClassificaCardEditor extends LitElement {
       .card-config {
         display: flex;
         flex-direction: column;
-        gap: 20px; /* Spazio tra le opzioni */
+        gap: 20px;
       }
       .option {
         display: flex;
@@ -31,17 +31,17 @@ class CalcioLiveClassificaCardEditor extends LitElement {
         margin-bottom: 10px;
       }
       ha-select {
-        width: 100%; /* Larghezza piena per il campo dei sensori */
+        width: 100%;
       }
       ha-textfield {
-        width: 100%; /* Larghezza piena per i campi numerici */
+        width: 100%;
       }
     `;
   }
 
   setConfig(config) {
     if (!config) {
-      throw new Error('Invalid configuration');
+      throw new Error('תצורה לא תקינה');
     }
     this._config = { ...config };
     this._entity = this._config.entity || '';
@@ -92,15 +92,13 @@ class CalcioLiveClassificaCardEditor extends LitElement {
     if (this.hass && entityId) {
       const stateObj = this.hass.states[entityId];
       if (stateObj && stateObj.attributes.standings_groups) {
-        // Otteniamo i gruppi dall'attributo standings_groups
+        // שליפת הקבוצות מהתכונה standings_groups
         this.groups = stateObj.attributes.standings_groups.map((group) => group.name);
       } else {
         this.groups = [];
       }
     }
   }
-  
-  
 
   _valueChanged(ev) {
     if (!this._config) return;
@@ -120,69 +118,68 @@ class CalcioLiveClassificaCardEditor extends LitElement {
 
     this.configChanged(newConfig);
   }
-  
 
   render() {
-      if (!this._config || !this.hass) {
-        return html``;
-      }
-
-      return html`
-        <div class="card-config">
-          <h3>CalcioLive Sensor:</h3>
-          <ha-select
-              naturalMenuWidth
-              fixedMenuPosition
-              label="Entity"
-              .configValue=${'entity'}
-              .value=${this._entity}
-              @change=${(e) => this._EntityChanged(e, 'entity')}
-              @closed=${(ev) => ev.stopPropagation()}
-              >
-              ${this.entities.map((entity) => {
-                  return html`<ha-list-item .value=${entity}>${entity}</ha-list-item>`;
-              })}
-          </ha-select>
-              
-        <h3>Settings:</h3>
-              
-        <div class="option">
-          <ha-select
-            label="Select Group"
-            .value=${this._config.selected_group || ''}
-            .configValue=${'selected_group'}
-            @change=${this._groupChanged}
-            @closed=${(ev) => ev.stopPropagation()} 
-          >
-            ${this.groups.length
-              ? this.groups.map((group) => html`
-                  <ha-list-item .value=${group}>${group}</ha-list-item>
-                `)
-              : html`<ha-list-item .value="">Nessun gruppo disponibile</ha-list-item>`}
-          </ha-select>
-        </div>
-
-        </div>
-          <div class="option">
-          <ha-switch
-            .checked=${this._config.hide_header === true}
-            @change=${this._valueChanged}
-            .configValue=${'hide_header'}
-          >
-          </ha-switch>
-          <label>Hide Header</label>
-        </div>
-        <div class="option">
-          <ha-textfield
-            label="Max Teams Visible"
-            type="number"
-            .value=${this._config.max_teams_visible || 10}
-            @change=${this._valueChanged}
-            .configValue=${'max_teams_visible'}
-          ></ha-textfield>
-        </div>
-      `;
+    if (!this._config || !this.hass) {
+      return html``;
     }
+
+    return html`
+      <div class="card-config">
+        <h3>חיישן CalcioLive:</h3>
+        <ha-select
+            naturalMenuWidth
+            fixedMenuPosition
+            label="ישות"
+            .configValue=${'entity'}
+            .value=${this._entity}
+            @change=${(e) => this._EntityChanged(e, 'entity')}
+            @closed=${(ev) => ev.stopPropagation()}
+            >
+            ${this.entities.map((entity) => {
+                return html`<ha-list-item .value=${entity}>${entity}</ha-list-item>`;
+            })}
+        </ha-select>
+            
+      <h3>הגדרות:</h3>
+            
+      <div class="option">
+        <ha-select
+          label="בחר קבוצה"
+          .value=${this._config.selected_group || ''}
+          .configValue=${'selected_group'}
+          @change=${this._groupChanged}
+          @closed=${(ev) => ev.stopPropagation()} 
+        >
+          ${this.groups.length
+            ? this.groups.map((group) => html`
+                <ha-list-item .value=${group}>${group}</ha-list-item>
+              `)
+            : html`<ha-list-item .value="">אין קבוצות זמינות</ha-list-item>`}
+        </ha-select>
+      </div>
+
+      </div>
+        <div class="option">
+        <ha-switch
+          .checked=${this._config.hide_header === true}
+          @change=${this._valueChanged}
+          .configValue=${'hide_header'}
+        >
+        </ha-switch>
+        <label>הסתר כותרת</label>
+      </div>
+      <div class="option">
+        <ha-textfield
+          label="מקסימום קבוצות להצגה"
+          type="number"
+          .value=${this._config.max_teams_visible || 10}
+          @change=${this._valueChanged}
+          .configValue=${'max_teams_visible'}
+        ></ha-textfield>
+      </div>
+    `;
+  }
 }
 
 customElements.define('calcio-live-classifica-editor', CalcioLiveClassificaCardEditor);
