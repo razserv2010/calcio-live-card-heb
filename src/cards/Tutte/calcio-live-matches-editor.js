@@ -20,7 +20,7 @@ class CalcioLiveTodayMatchesEditor extends LitElement {
       .card-config {
         display: flex;
         flex-direction: column;
-        gap: 20px; /* Spazio tra le opzioni */
+        gap: 20px;
       }
       .option {
         display: flex;
@@ -29,17 +29,17 @@ class CalcioLiveTodayMatchesEditor extends LitElement {
         margin-bottom: 10px;
       }
       ha-select {
-        width: 100%; /* Larghezza piena per il campo dei sensori */
+        width: 100%;
       }
       ha-textfield {
-        width: 100%; /* Larghezza piena per i campi numerici */
+        width: 100%;
       }
     `;
   }
 
   setConfig(config) {
     if (!config) {
-      throw new Error('Invalid configuration');
+      throw new Error('תצורה לא תקינה');
     }
     this._config = { ...config };
     this._entity = this._config.entity || '';
@@ -83,7 +83,7 @@ class CalcioLiveTodayMatchesEditor extends LitElement {
         .sort();
     }
   }
-  
+
   _valueChanged(ev) {
     if (!this._config) return;
     const target = ev.target;
@@ -96,81 +96,81 @@ class CalcioLiveTodayMatchesEditor extends LitElement {
   }
 
   render() {
-      if (!this._config || !this.hass) {
-        return html``;
-      }
-
-      return html`
-        <div class="card-config">
-          <h3>CalcioLive Sensor:</h3>
-          <ha-select
-              naturalMenuWidth
-              fixedMenuPosition
-              label="Entity"
-              .configValue=${'entity'}
-              .value=${this._entity}
-              @change=${(e) => this._EntityChanged(e, 'entity')}
-              @closed=${(ev) => ev.stopPropagation()}
-              >
-              ${this.entities.map((entity) => {
-                  return html`<ha-list-item .value=${entity}>${entity}</ha-list-item>`;
-              })}
-          </ha-select>
-        
-          <h3>Settings:</h3>
-          <div class="option">
-            <ha-switch
-              .checked=${this._config.show_finished_matches !== false}
-              @change=${this._valueChanged}
-              .configValue=${'show_finished_matches'}
-            >
-            </ha-switch>
-            <label>Show Finished Matches</label>
-          </div>
-
-          <div class="option">
-            <ha-switch
-              .checked=${this._config.hide_header === true}
-              @change=${this._valueChanged}
-              .configValue=${'hide_header'}
-            >
-            </ha-switch>
-            <label>Hide Header</label>
-          </div>
-
-          <div class="option">
-            <ha-textfield
-              label="Max Events Visible"
-              type="number"
-              .value=${this._config.max_events_visible || 5}
-              @change=${this._valueChanged}
-              .configValue=${'max_events_visible'}
-            ></ha-textfield>
-          </div>
-
-          <div class="option">
-            <ha-textfield
-              label="Max Events Total"
-              type="number"
-              .value=${this._config.max_events_total || 50}
-              @change=${this._valueChanged}
-              .configValue=${'max_events_total'}
-            ></ha-textfield>
-          </div>
-          
-          <h4>For work, 'Show Finished Matches' it must be enabled. </h4>
-          <div class="option">
-            <ha-textfield
-              label="Hide Matches Older Than (Days)"
-              type="number"
-              .value=${this._config.hide_past_days || 0}
-              @change=${this._valueChanged}
-              .configValue=${'hide_past_days'}
-            ></ha-textfield>
-          </div>
-        </div>
-      `;
+    if (!this._config || !this.hass) {
+      return html``;
     }
+
+    return html`
+      <div class="card-config">
+        <h3>חיישן CalcioLive:</h3>
+        <ha-select
+            naturalMenuWidth
+            fixedMenuPosition
+            label="ישות"
+            .configValue=${'entity'}
+            .value=${this._entity}
+            @change=${(e) => this._EntityChanged(e, 'entity')}
+            @closed=${(ev) => ev.stopPropagation()}
+            >
+            ${this.entities.map((entity) => {
+                return html`<ha-list-item .value=${entity}>${entity}</ha-list-item>`;
+            })}
+        </ha-select>
+      
+        <h3>הגדרות:</h3>
+        <div class="option">
+          <ha-switch
+            .checked=${this._config.show_finished_matches !== false}
+            @change=${this._valueChanged}
+            .configValue=${'show_finished_matches'}
+          >
+          </ha-switch>
+          <label>הצג משחקים שהסתיימו</label>
+        </div>
+
+        <div class="option">
+          <ha-switch
+            .checked=${this._config.hide_header === true}
+            @change=${this._valueChanged}
+            .configValue=${'hide_header'}
+          >
+          </ha-switch>
+          <label>הסתר כותרת</label>
+        </div>
+
+        <div class="option">
+          <ha-textfield
+            label="מקסימום אירועים להצגה"
+            type="number"
+            .value=${this._config.max_events_visible || 5}
+            @change=${this._valueChanged}
+            .configValue=${'max_events_visible'}
+          ></ha-textfield>
+        </div>
+
+        <div class="option">
+          <ha-textfield
+            label="מקסימום אירועים סה״כ"
+            type="number"
+            .value=${this._config.max_events_total || 50}
+            @change=${this._valueChanged}
+            .configValue=${'max_events_total'}
+          ></ha-textfield>
+        </div>
+        
+        <h4>לתפקוד תקין, יש להפעיל את 'הצג משחקים שהסתיימו'.</h4>
+        <div class="option">
+          <ha-textfield
+            label="הסתר משחקים ישנים יותר מ- (ימים)"
+            type="number"
+            .value=${this._config.hide_past_days || 0}
+            @change=${this._valueChanged}
+            .configValue=${'hide_past_days'}
+          ></ha-textfield>
+        </div>
+      </div>
+    `;
+  }
 }
 
 customElements.define('calcio-live-matches-editor', CalcioLiveTodayMatchesEditor);
