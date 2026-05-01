@@ -13,10 +13,10 @@ class CalcioLiveCannonieriCard extends LitElement {
 
   setConfig(config) {
     if (!config.entity) {
-      throw new Error("Devi definire un'entità");
+      throw new Error("יש להגדיר ישות");
     }
     this._config = config;
-    this.maxEventsVisible = config.max_events_visible ? config.max_events_visible : 5
+    this.maxEventsVisible = config.max_events_visible ? config.max_events_visible : 5;
     this.maxEventsTotal = config.max_events_total ? config.max_events_total : 10;
     this.hideHeader = config.hide_header || false;
   }
@@ -27,18 +27,18 @@ class CalcioLiveCannonieriCard extends LitElement {
 
   formatDate(dateString) {
     if (!dateString) {
-      return 'Data non disponibile';
+      return 'תאריך לא זמין';
     }
     const date = new Date(dateString);
     if (isNaN(date.getTime())) {
-      return 'Data non valida';
+      return 'תאריך לא תקין';
     }
     const options = {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric',
     };
-    return new Intl.DateTimeFormat('it-IT', options).format(date);
+    return new Intl.DateTimeFormat('he-IL', options).format(date);
   }
 
   render() {
@@ -50,7 +50,7 @@ class CalcioLiveCannonieriCard extends LitElement {
     const stateObj = this.hass.states[entityId];
 
     if (!stateObj) {
-      return html`<ha-card>Entità sconosciuta: ${entityId}</ha-card>`;
+      return html`<ha-card>ישות לא ידועה: ${entityId}</ha-card>`;
     }
 
     const scorers = stateObj.attributes.scorers || [];
@@ -72,14 +72,13 @@ class CalcioLiveCannonieriCard extends LitElement {
                 <div class="header-row">
                   <img class="competition-emblem" src="${competition.emblem}" alt="${competition.name}" />
                   <div class="competition-details">
-                    <div class="competition-name">Cannonieri</div>
-                    <div class="season-dates">Stagione: ${this.formatDate(season.startDate)} - ${this.formatDate(season.endDate)}</div>
+                    <div class="competition-name">מלך השערים</div>
+                    <div class="season-dates">עונה: ${this.formatDate(season.startDate)} - ${this.formatDate(season.endDate)}</div>
                   </div>
                 </div>
                 <hr class="separator" />
               </div>
             `}
-        <!-- Sezione scrollabile -->
         <div class="scroll-content" style="max-height: ${maxHeight}px; overflow-y: auto;">
           ${scorers.slice(0, maxTotal).map((scorer, index) => html`
             <div class="scorer ${index % 2 === 0 ? 'even' : 'odd'}">
@@ -87,8 +86,8 @@ class CalcioLiveCannonieriCard extends LitElement {
               <div class="info">
                 <div class="player-name">${scorer.player.name} <span class="nationality">(${scorer.player.nationality})</span></div>
                 <div class="team-name">${scorer.team.name}</div>
-                <div class="goals">Goals: <span class="goals-number">${scorer.goals}</span></div>
-                <div class="played-matches">Partite giocate: <span class="matches-number">${scorer.playedMatches}</span></div>
+                <div class="goals">שערים: <span class="goals-number">${scorer.goals}</span></div>
+                <div class="played-matches">משחקים שיחק: <span class="matches-number">${scorer.playedMatches}</span></div>
               </div>
             </div>
           `)}
@@ -140,7 +139,6 @@ class CalcioLiveCannonieriCard extends LitElement {
         border-radius: 10px;
         transition: background-color 0.3s ease;
       }
-
       .team-logo {
         width: 60px;
         height: 60px;
