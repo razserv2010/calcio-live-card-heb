@@ -15,7 +15,7 @@ class CalcioLiveStandingsCard extends LitElement {
 
   setConfig(config) {
     if (!config.entity) {
-      throw new Error("Devi definire un'entità");
+      throw new Error("יש להגדיר ישות");
     }
     this._config = config;
     this.maxTeamsVisible = config.max_teams_visible ? config.max_teams_visible : 10;
@@ -78,13 +78,13 @@ class CalcioLiveStandingsCard extends LitElement {
   _showEventToast(eventType, eventData) {
     let message = '';
     if (eventType === 'calcio_live_goal') {
-      message = `🔥 GOAL! ${eventData.player} - ${eventData.home_team} ${eventData.home_score} - ${eventData.away_score} ${eventData.away_team}`;
+      message = `🔥 שער! ${eventData.player} - ${eventData.home_team} ${eventData.home_score} - ${eventData.away_score} ${eventData.away_team}`;
     } else if (eventType === 'calcio_live_yellow_card') {
-      message = `🟨 Cartellino Giallo: ${eventData.player}${eventData.minute ? ` (${eventData.minute}')` : ''}`;
+      message = `🟨 כרטיס צהוב: ${eventData.player}${eventData.minute ? ` (${eventData.minute}')` : ''}`;
     } else if (eventType === 'calcio_live_red_card') {
-      message = `🟥 Cartellino Rosso: ${eventData.player}${eventData.minute ? ` (${eventData.minute}')` : ''}`;
+      message = `🟥 כרטיס אדום: ${eventData.player}${eventData.minute ? ` (${eventData.minute}')` : ''}`;
     } else if (eventType === 'calcio_live_match_finished') {
-      message = `✅ Partita Terminata! ${eventData.home_team} ${eventData.home_score} - ${eventData.away_score} ${eventData.away_team}`;
+      message = `✅ המשחק הסתיים! ${eventData.home_team} ${eventData.home_score} - ${eventData.away_score} ${eventData.away_team}`;
     }
     if (message && this.hass) {
       this.hass.callService('persistent_notification', 'create', {
@@ -122,7 +122,7 @@ class CalcioLiveStandingsCard extends LitElement {
     const stateObj = this.hass.states[entityId];
 
     if (!stateObj) {
-      return html`<ha-card>Entità sconosciuta: ${entityId}</ha-card>`;
+      return html`<ha-card>ישות לא ידועה: ${entityId}</ha-card>`;
     }
 
     const standings = stateObj.attributes.standings || [];
@@ -130,16 +130,16 @@ class CalcioLiveStandingsCard extends LitElement {
     const seasonStart = stateObj.attributes.season_start || '';
     const seasonEnd = stateObj.attributes.season_end || '';
     
-    // Filtra la classifica in base al gruppo selezionato, se esiste
+    // סינון טבלת הדירוג לפי הקבוצה שנבחרה, אם קיימת
     const standingsGroup = stateObj.attributes.standings_groups.find(
       (group) => group.name === this.selectedGroup
     );
     let filteredStandings = standingsGroup ? standingsGroup.standings : [];
 
-    // Filtra le squadre che hanno un rank valido (non null o undefined)
+    // סינון קבוצות עם דירוג תקין (לא null או undefined)
     filteredStandings = filteredStandings.filter(team => team.rank != null && team.rank !== undefined);
 
-    // Ordinamento classifica (MSL sopratutto)
+    // מיון טבלת הדירוג (בעיקר עבור MLS)
     if (seasonName.includes("MLS")) {
       filteredStandings = filteredStandings.sort((a, b) => {
         if (b.points !== a.points) {
@@ -151,15 +151,13 @@ class CalcioLiveStandingsCard extends LitElement {
         return b.goals_for - a.goals_for;
       });
 
-      // Riassegna il rank in ordine corretto
+      // הקצאה מחדש של הדירוג בסדר הנכון
       filteredStandings.forEach((team, index) => {
         team.rank = index + 1;
       });
     } else {
       filteredStandings = filteredStandings.sort((a, b) => a.rank - b.rank);
     }
-    
-    
 
     const maxVisible = Math.min(this.maxTeamsVisible, filteredStandings.length);
 
@@ -183,14 +181,14 @@ class CalcioLiveStandingsCard extends LitElement {
             <table>
               <thead>
                 <tr>
-                  <th class="small-column">Pos</th>
-                  <th class="team-column">Squadra</th>
-                  <th class="small-column">Punti</th>
-                  <th class="small-column">V</th>
-                  <th class="small-column">P</th>
-                  <th class="small-column">S</th>
-                  <th class="small-column">GF</th>
-                  <th class="small-column">GS</th>
+                  <th class="small-column">מיקום</th>
+                  <th class="team-column">קבוצה</th>
+                  <th class="small-column">נקודות</th>
+                  <th class="small-column">נ</th>
+                  <th class="small-column">ת</th>
+                  <th class="small-column">ה</th>
+                  <th class="small-column">גבש</th>
+                  <th class="small-column">גנש</th>
                   <th class="small-column">+/-</th>
                 </tr>
               </thead>
@@ -319,6 +317,6 @@ customElements.define("calcio-live-classifica", CalcioLiveStandingsCard);
 window.customCards = window.customCards || [];
 window.customCards.push({
   type: 'calcio-live-classifica',
-  name: 'Calcio Live Classifica Card',
-  description: 'Mostra la classifica del campionato o coppe',
+  name: 'Calcio Live - כרטיס טבלת דירוג',
+  description: 'מציג את טבלת הדירוג של הליגה או הגביע',
 });
