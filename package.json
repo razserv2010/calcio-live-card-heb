@@ -1,5 +1,5 @@
 {
-  "name": "calcio-live-card",
+  "name": "calcio-live-card-heb",
   "version": "2.5.1",
   "main": "webpack.config.js",
   "scripts": {
@@ -7,15 +7,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://Bobsilvio@github.com/Bobsilvio/calcio-live-card.git"
+    "url": "git+https://razserv2010@github.com/razserv2010/calcio-live-card-heb.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/Bobsilvio/calcio-live-card/issues"
+    "url": "https://github.com/razserv2010/calcio-live-card-heb/issues"
   },
-  "homepage": "https://github.com/Bobsilvio/calcio-live-card#readme",
+  "homepage": "https://github.com/razserv2010/calcio-live-card-heb#readme",
   "devDependencies": {
     "@babel/core": "^7.25.2",
     "@babel/preset-env": "^7.25.4",
