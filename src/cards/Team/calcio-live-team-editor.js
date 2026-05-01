@@ -20,7 +20,7 @@ class CalcioLiveTeamNextCardEditor extends LitElement {
       .card-config {
         display: flex;
         flex-direction: column;
-        gap: 20px; /* Spazio tra le opzioni */
+        gap: 20px;
       }
       .option {
         display: flex;
@@ -29,17 +29,17 @@ class CalcioLiveTeamNextCardEditor extends LitElement {
         margin-bottom: 10px;
       }
       ha-select {
-        width: 100%; /* Larghezza piena per il campo dei sensori */
+        width: 100%;
       }
       ha-textfield {
-        width: 100%; /* Larghezza piena per i campi numerici */
+        width: 100%;
       }
     `;
   }
 
   setConfig(config) {
     if (!config) {
-      throw new Error('Invalid configuration');
+      throw new Error('תצורה לא תקינה');
     }
     this._config = { ...config };
     this._entity = this._config.entity || '';
@@ -69,10 +69,8 @@ class CalcioLiveTeamNextCardEditor extends LitElement {
 
   _EntityChanged(ev) {
     if (!this._config) return;
-
     const newConfig = { ...this._config, entity: ev.target.value };
     this._entity = ev.target.value;
-
     this.configChanged(newConfig);
   }
 
@@ -83,12 +81,11 @@ class CalcioLiveTeamNextCardEditor extends LitElement {
         .sort();
     }
   }
-  
+
   _valueChanged(ev) {
     if (!this._config) return;
     const target = ev.target;
     const value = target.type === 'number' ? parseInt(target.value, 10) : (target.checked !== undefined ? target.checked : target.value);
-
     if (target.configValue) {
       const newConfig = { ...this._config, [target.configValue]: value };
       this.configChanged(newConfig);
@@ -96,29 +93,28 @@ class CalcioLiveTeamNextCardEditor extends LitElement {
   }
 
   render() {
-      if (!this._config || !this.hass) {
-        return html``;
-      }
-
-      return html`
-        <div class="card-config">
-          <h4>CalcioLive Sensor:</h4>
-          <ha-select
-              naturalMenuWidth
-              fixedMenuPosition
-              label="Entity"
-              .configValue=${'entity'}
-              .value=${this._entity}
-              @change=${(e) => this._EntityChanged(e, 'entity')}
-              @closed=${(ev) => ev.stopPropagation()}
-              >
-              ${this.entities.map((entity) => {
-                  return html`<ha-list-item .value=${entity}>${entity}</ha-list-item>`;
-              })}
-          </ha-select>
-        </div>
-      `;
+    if (!this._config || !this.hass) {
+      return html``;
     }
+    return html`
+      <div class="card-config">
+        <h4>חיישן CalcioLive:</h4>
+        <ha-select
+            naturalMenuWidth
+            fixedMenuPosition
+            label="ישות"
+            .configValue=${'entity'}
+            .value=${this._entity}
+            @change=${(e) => this._EntityChanged(e, 'entity')}
+            @closed=${(ev) => ev.stopPropagation()}
+            >
+            ${this.entities.map((entity) => {
+                return html`<ha-list-item .value=${entity}>${entity}</ha-list-item>`;
+            })}
+        </ha-select>
+      </div>
+    `;
+  }
 }
 
 customElements.define('calcio-live-team-editor', CalcioLiveTeamNextCardEditor);
